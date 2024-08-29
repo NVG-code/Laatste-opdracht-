@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id
+  username       String
+  password       String
+  name           String
+  email          String     @unique
+  phoneNumber    String
+  profilePicture String
+  bookings       Booking[]
+  reviews        Review[]
+}
+
+model Host {
+  id             String     @id
+  username       String
+  password       String
+  name           String
+  email          String     @unique
+  phoneNumber    String
+  profilePicture String
+  aboutMe        String
+  properties     Property[]
+}
+
+model Property {
+  id            String          @id
+  name          String
+  location      String
+  pricePerNight Decimal
+  hostId        String
+  host          Host            @relation(fields: [hostId], references: [id])
+  amenities     PropertyAmenity[]
+  bookings      Booking[]
+  reviews       Review[]
+}
+
+model Amenity {
+  id          String          @id
+  name        String
+  properties  PropertyAmenity[]
+}
+
+model Booking {
+  id            String    @id
+  checkinDate   DateTime  @map("checkinDate")
+  checkoutDate  DateTime  @map("checkoutDate")
+  numberOfGuests Int
+  totalPrice    Decimal
+  bookingStatus String
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  propertyId    String
+  property      Property  @relation(fields: [propertyId], references: [id])
+}
+
+model Review {
+  id         String     @id
+  rating     Int
+  comment    String
+  userId     String
+  user       User       @relation(fields: [userId], references: [id])
+  propertyId String
+  property   Property   @relation(fields: [propertyId], references: [id])
+}
+
+model PropertyAmenity {
+  id         String    @id
+  propertyId String
+  property   Property  @relation(fields: [propertyId], references: [id])
+  amenityId  String
+  amenity    Amenity   @relation(fields: [amenityId], references: [id])
+}
